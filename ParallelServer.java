@@ -30,27 +30,29 @@ public class ParallelServer
                     DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
                     String clientSentence;
                     String returnSentence;
+                    int clientId;
                     
-                    //one at a time, a server will get client message and return it all uppercase
                     mutex.lock();
                     try{
                         count++;
-                        
-                        clientSentence = inFromClient.readLine();
-                        System.out.println("Message from Client " + count + ": " + clientSentence);
-                        returnSentence = "Client " + count + ": " + clientSentence + "\n";
-                        outToClient.writeBytes(returnSentence.toUpperCase());
-                        connectionSocket.close();
+                        clientId = count;
                     }
                     finally
                     {
                         mutex.unlock();
                     }
+
+                    clientSentence = inFromClient.readLine();
+                    System.out.println("Message from Client " + clientId + ": " + clientSentence);
+                    returnSentence = "Client " + clientId + ": " + clientSentence + "\n";
+                    outToClient.writeBytes(returnSentence.toUpperCase());
+                    connectionSocket.close();
                 }
                 catch (IOException e)
                 {
                     e.printStackTrace();
                 }
+
         }
     }
 
@@ -74,7 +76,6 @@ public class ParallelServer
             
             Thread thread = new Thread(obj);
             thread.start();
-            thread.join();
         }
     }
 }
